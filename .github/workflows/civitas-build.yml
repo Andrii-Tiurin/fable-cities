@@ -17,10 +17,10 @@ jobs:
           cache: npm
       - name: Install
         run: npm ci
-      - name: Build mobile-ready CIVITAS
+      - name: Build CIVITAS for GitHub Pages
         run: |
           node tools/civitas-patch.mjs
-          npm run build
+          npx vite build --base=/fable-cities/
       - name: Publish GitHub Pages
         run: |
           mkdir -p docs

@@ -1,0 +1,33 @@
+name: Build CIVITAS Fable Cities
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Build mobile-ready CIVITAS
+        run: |
+          node tools/civitas-patch.mjs
+          npm run build
+      - name: Publish GitHub Pages
+        run: |
+          mkdir -p docs
+          cp -a dist/. docs/
+          touch docs/.nojekyll
+          git config user.name civitas-bot
+          git config user.email actions@users.noreply.github.com
+          git add docs
+          git diff --cached --quiet || git commit -m 'Publish CIVITAS Fable Cities browser build [skip ci]'
+          git push
